@@ -4,9 +4,7 @@ Minimal ROS 2 workspace for Gazebo simulation of the **Unitree B2** robot only. 
 
 ## Supported robot
 
-| Robot | Launch argument |
-|-------|-----------------|
-| Unitree B2 | `rname:=b2` (default, only supported value) |
+Unitree B2 only (hardcoded in the launch file).
 
 ## Dependencies
 
@@ -41,20 +39,11 @@ source install/setup.bash
 ros2 launch b2_sim gazebo.launch.py
 ```
 
-Equivalent to the original rl_sar command:
+Optional Gazebo launch arguments (from `gazebo_ros`):
 
 ```bash
-ros2 launch rl_sar gazebo.launch.py rname:=b2
-```
-
-Optional launch arguments:
-
-```bash
-ros2 launch b2_sim gazebo.launch.py wname:=earth
 ros2 launch b2_sim gazebo.launch.py gui:=false paused:=true
 ```
-
-If `rname` is set to anything other than `b2`, the launch will fail with an error.
 
 ## Workspace packages
 

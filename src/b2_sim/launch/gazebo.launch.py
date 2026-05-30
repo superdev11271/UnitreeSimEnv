@@ -5,32 +5,18 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction
+from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import Command, LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import Command
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
-from launch_ros.substitutions import FindPackageShare
 
 
 ROBOT_NAME = "b2"
 
 
-def _validate_robot_name(context, *args, **kwargs):
-    requested = LaunchConfiguration("rname").perform(context)
-    if requested and requested != ROBOT_NAME:
-        raise RuntimeError(
-            f"This workspace only supports Unitree B2 (rname:={ROBOT_NAME}). "
-            f"Got rname:={requested}."
-        )
-    return []
-
-
 def generate_launch_description():
-    wname = LaunchConfiguration("wname")
-    gui = LaunchConfiguration("gui")
-    paused = LaunchConfiguration("paused")
-    use_sim_time = LaunchConfiguration("use_sim_time")
+    wname = "stairs"
 
     robot_description = ParameterValue(
         Command([
@@ -49,12 +35,7 @@ def generate_launch_description():
         executable="robot_state_publisher",
         name="robot_state_publisher",
         output="screen",
-        parameters=[
-            {
-                "use_sim_time": use_sim_time,
-                "robot_description": robot_description,
-            }
-        ],
+        parameters=[{"robot_description": robot_description}],
     )
 
     gazebo = IncludeLaunchDescription(
@@ -66,15 +47,11 @@ def generate_launch_description():
             )
         ),
         launch_arguments={
-            "world": PathJoinSubstitution([
-                FindPackageShare("b2_sim"),
+            "world": os.path.join(
+                get_package_share_directory("b2_sim"),
                 "worlds",
-                wname,
-                ".world",
-            ]),
-            "gui": gui,
-            "paused": paused,
-            "use_sim_time": use_sim_time,
+                wname + ".world",
+            ),
         }.items(),
     )
 
@@ -84,19 +61,17 @@ def generate_launch_description():
         arguments=[
             "-topic", "/robot_description",
             "-entity", "robot_model",
-            "-z", "1.0",
+            "-x", "-7.089579",
+            "-y", "-4.607656",
+            "-z", "11.515228",
         ],
         output="screen",
     )
 
-    spawner_executable = (
-        "spawner.py" if os.environ.get("ROS_DISTRO", "") == "foxy" else "spawner"
-    )
-
     joint_state_broadcaster_node = Node(
         package="controller_manager",
-        executable=spawner_executable,
-        arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
+        executable='spawner.py' if os.environ.get('ROS_DISTRO', '') == 'foxy' else 'spawner',
+        arguments=["joint_state_broadcaster"],
         output="screen",
     )
 
@@ -122,20 +97,6 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        DeclareLaunchArgument(
-            "rname",
-            default_value=ROBOT_NAME,
-            description="Robot name (only b2 is supported)",
-        ),
-        DeclareLaunchArgument(
-            "wname",
-            default_value="stairs",
-            description="World name without extension (stairs or earth)",
-        ),
-        DeclareLaunchArgument("gui", default_value="true"),
-        DeclareLaunchArgument("paused", default_value="false"),
-        DeclareLaunchArgument("use_sim_time", default_value="true"),
-        OpaqueFunction(function=_validate_robot_name),
         robot_state_publisher_node,
         gazebo,
         spawn_entity,
