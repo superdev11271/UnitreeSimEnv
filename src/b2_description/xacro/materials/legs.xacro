@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:macro name="leg_gazebo_props" params="prefix">
+        <gazebo reference="${prefix}_hip">
+            <mu1>0.2</mu1>
+            <mu2>0.2</mu2>
+        </gazebo>
+        <gazebo reference="${prefix}_thigh">
+            <mu1>0.2</mu1>
+            <mu2>0.2</mu2>
+            <self_collide>1</self_collide>
+            <kp value="1000000.0"/>
+            <kd value="1.0"/>
+        </gazebo>
+        <gazebo reference="${prefix}_calf">
+            <mu1>0.2</mu1>
+            <mu2>0.2</mu2>
+            <self_collide>1</self_collide>
+        </gazebo>
+        <gazebo reference="${prefix}_foot">
+            <mu1>0.6</mu1>
+            <mu2>0.6</mu2>
+            <self_collide>1</self_collide>
+            <kp value="1000000.0"/>
+            <kd value="1.0"/>
+        </gazebo>
+    </xacro:macro>
+
+    <xacro:leg_gazebo_props prefix="FL"/>
+    <xacro:leg_gazebo_props prefix="FR"/>
+    <xacro:leg_gazebo_props prefix="RL"/>
+    <xacro:leg_gazebo_props prefix="RR"/>
+</robot>

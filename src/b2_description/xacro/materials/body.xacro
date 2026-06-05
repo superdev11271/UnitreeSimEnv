@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <gazebo reference="base">
+        <material>Gazebo/Green</material>
+        <turnGravityOff>false</turnGravityOff>
+    </gazebo>
+
+    <gazebo reference="trunk">
+        <mu1>0.2</mu1>
+        <mu2>0.2</mu2>
+        <kp value="1000000.0"/>
+        <kd value="1.0"/>
+    </gazebo>
+
+    <gazebo reference="stick_link">
+        <mu1>0.2</mu1>
+        <mu2>0.2</mu2>
+        <material>Gazebo/White</material>
+    </gazebo>
+</robot>

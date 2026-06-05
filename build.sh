@@ -2,21 +2,23 @@
 set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-source "${SCRIPT_DIR}/scripts/common.sh"
 
-setup_b2_description() {
-    print_header "[Setting up B2 Description]"
-    bash "${SCRIPT_DIR}/scripts/download_b2_description.sh" || {
-        print_error "Failed to setup B2 description"
-        exit 1
-    }
+COLOR_ERROR='\033[0;31m'
+COLOR_SUCCESS='\033[0;32m'
+COLOR_INFO='\033[0;34m'
+COLOR_RESET='\033[0m'
+
+print_success() {
+    echo -e "${COLOR_SUCCESS}[SUCCESS]${COLOR_RESET} $1"
 }
 
-setup_gazebo_models() {
-    local script="${SCRIPT_DIR}/scripts/download_gazebo_models.sh"
-    if [ -f "$script" ]; then
-        bash "$script" || print_warning "Gazebo models setup skipped (optional)"
-    fi
+print_error() {
+    echo -e "${COLOR_ERROR}[ERROR]${COLOR_RESET} $1"
+}
+
+print_header() {
+    echo -e "${COLOR_INFO}-------------------------------------------------------------------${COLOR_RESET}"
+    echo -e "${COLOR_INFO}$1${COLOR_RESET}"
 }
 
 create_ros2_package_symlinks() {
@@ -72,8 +74,6 @@ main() {
         -h|--help) show_usage; exit 0 ;;
     esac
 
-    setup_b2_description
-    setup_gazebo_models
     create_ros2_package_symlinks
     run_ros_build "$@"
 }

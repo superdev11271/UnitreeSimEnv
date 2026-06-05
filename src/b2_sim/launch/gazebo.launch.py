@@ -5,9 +5,9 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import Command
+from launch.substitutions import Command, LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 
@@ -16,7 +16,23 @@ ROBOT_NAME = "b2"
 
 
 def generate_launch_description():
-    wname = "stairs"
+    declare_gpu = DeclareLaunchArgument(
+        "gpu",
+        default_value="true",
+        description="Use gpu_ray for lidar (true) or ray for CPU lidar (false)",
+    )
+    declare_headless = DeclareLaunchArgument(
+        "headless",
+        default_value="false",
+        description="Run Gazebo without GUI",
+    )
+
+    gpu = LaunchConfiguration("gpu")
+    headless = LaunchConfiguration("headless")
+    gui = PythonExpression([
+        "'false' if '", headless, "' == 'true' else 'true'",
+    ])
+    wname = "earth"
 
     robot_description = ParameterValue(
         Command([
@@ -26,6 +42,7 @@ def generate_launch_description():
                 "xacro",
                 "robot.xacro",
             ),
+            " gpu:=", gpu,
         ]),
         value_type=str,
     )
@@ -52,6 +69,7 @@ def generate_launch_description():
                 "worlds",
                 wname + ".world",
             ),
+            "gui": gui,
         }.items(),
     )
 
@@ -97,6 +115,8 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        declare_gpu,
+        declare_headless,
         robot_state_publisher_node,
         gazebo,
         spawn_entity,

@@ -38,8 +38,11 @@
             <uri>model://ground_plane</uri>
         </include>
         <!-- environment blocks, obstacles or stairs -->
-        <model name="static_environment">
-            <static>true</static>
-        </model>
+        <include>
+	  <uri>model://my_model</uri>
+	  <name>my_model_instance</name>
+	  <pose>1 0 0 0 0 0</pose>
+	</include>
+   
     </world>
 </sdf>

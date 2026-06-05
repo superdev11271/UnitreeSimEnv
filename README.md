@@ -30,7 +30,7 @@ source /opt/ros/$ROS_DISTRO/setup.bash
 ./build.sh
 ```
 
-The build script downloads the B2 URDF/meshes from [rl_sar_zoo](https://github.com/fan-ziqi/rl_sar_zoo) and optional Gazebo models (`sun`, `ground_plane`).
+Ensure `src/b2_description` (from [rl_sar_zoo](https://github.com/fan-ziqi/rl_sar_zoo)) and Gazebo models (`sun`, `ground_plane` in `~/.gazebo/models`) are present before building.
 
 ## Run
 
@@ -39,10 +39,12 @@ source install/setup.bash
 ros2 launch b2_sim gazebo.launch.py
 ```
 
-Optional Gazebo launch arguments (from `gazebo_ros`):
+Optional launch arguments:
 
 ```bash
-ros2 launch b2_sim gazebo.launch.py gui:=false paused:=true
+ros2 launch b2_sim gazebo.launch.py headless:=true
+ros2 launch b2_sim gazebo.launch.py gpu:=false
+ros2 launch b2_sim gazebo.launch.py headless:=true gpu:=true
 ```
 
 ## Workspace packages
