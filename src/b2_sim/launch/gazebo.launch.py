@@ -5,7 +5,8 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription, RegisterEventHandler
+from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command, LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
@@ -13,6 +14,7 @@ from launch_ros.parameter_descriptions import ParameterValue
 
 
 ROBOT_NAME = "b2"
+SPAWNER = "spawner.py" if os.environ.get("ROS_DISTRO", "") == "foxy" else "spawner"
 
 
 def generate_launch_description():
@@ -34,14 +36,17 @@ def generate_launch_description():
     ])
     wname = "earth"
 
+    b2_description_share = get_package_share_directory("b2_description")
+    robot_joint_controller_params = os.path.join(
+        b2_description_share,
+        "config",
+        "robot_joint_controller_params.yaml",
+    )
+
     robot_description = ParameterValue(
         Command([
             "xacro ",
-            os.path.join(
-                get_package_share_directory("b2_description"),
-                "xacro",
-                "robot.xacro",
-            ),
+            os.path.join(b2_description_share, "xacro", "robot.xacro"),
             " gpu:=", gpu,
         ]),
         value_type=str,
@@ -88,9 +93,36 @@ def generate_launch_description():
 
     joint_state_broadcaster_node = Node(
         package="controller_manager",
-        executable='spawner.py' if os.environ.get('ROS_DISTRO', '') == 'foxy' else 'spawner',
+        executable=SPAWNER,
         arguments=["joint_state_broadcaster"],
         output="screen",
+    )
+
+    install_rl_sar_params_file = ExecuteProcess(
+        cmd=["cp", "-f", robot_joint_controller_params, "/tmp/robot_joint_controller_params.yaml"],
+        output="log",
+    )
+
+    # rl_sim deletes /tmp/robot_joint_controller_params.yaml after spawning the
+    # controller, but gzserver may still need that path while loading it.
+    keep_rl_sar_params_file = ExecuteProcess(
+        cmd=[
+            "bash", "-c",
+            (
+                f'while true; do '
+                f'if [ ! -f /tmp/robot_joint_controller_params.yaml ]; then '
+                f'cp -f "{robot_joint_controller_params}" /tmp/robot_joint_controller_params.yaml; '
+                f'fi; sleep 0.05; done'
+            ),
+        ],
+        output="log",
+    )
+
+    load_joint_state_broadcaster = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=spawn_entity,
+            on_exit=[joint_state_broadcaster_node],
+        ),
     )
 
     joy_node = Node(
@@ -117,10 +149,12 @@ def generate_launch_description():
     return LaunchDescription([
         declare_gpu,
         declare_headless,
+        install_rl_sar_params_file,
+        keep_rl_sar_params_file,
         robot_state_publisher_node,
         gazebo,
         spawn_entity,
-        joint_state_broadcaster_node,
+        load_joint_state_broadcaster,
         joy_node,
         param_node,
     ])

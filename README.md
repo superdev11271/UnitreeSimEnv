@@ -58,7 +58,7 @@ ros2 launch b2_sim gazebo.launch.py headless:=true gpu:=true
 
 ## Connect an external controller
 
-This workspace starts only the simulation environment. To control the robot with rl_sar:
+This workspace starts the simulation environment. `robot_joint_controller` is spawned by rl_sar when you run `rl_sim`. To control the robot with rl_sar:
 
 1. Start this simulation: `ros2 launch b2_sim gazebo.launch.py`
 2. In another terminal, run rl_sar controller: `ros2 run rl_sar rl_sim`
