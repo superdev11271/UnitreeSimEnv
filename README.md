@@ -30,7 +30,11 @@ source /opt/ros/$ROS_DISTRO/setup.bash
 ./build.sh
 ```
 
-Ensure `src/b2_description` (from [rl_sar_zoo](https://github.com/fan-ziqi/rl_sar_zoo)) and Gazebo models (`sun`, `ground_plane` in `~/.gazebo/models`) are present before building.
+Ensure `src/b2_description` (from [rl_sar_zoo](https://github.com/fan-ziqi/rl_sar_zoo)), the `velodyne_simulator` submodule, and Gazebo models (`sun`, `ground_plane` in `~/.gazebo/models`) are present before building.
+
+```bash
+git submodule update --init --recursive
+```
 
 ## Run
 
@@ -47,6 +51,8 @@ ros2 launch b2_sim gazebo.launch.py gpu:=false
 ros2 launch b2_sim gazebo.launch.py headless:=true gpu:=true
 ```
 
+Lidar output: `/rslidar_points` (`sensor_msgs/PointCloud2` with `ring` and `timestamp` fields via [velodyne_simulator](https://github.com/superdev11271/velodyne_simulator/tree/rslidar)).
+
 ## Workspace packages
 
 | Package | Purpose |
@@ -55,6 +61,7 @@ ros2 launch b2_sim gazebo.launch.py headless:=true gpu:=true
 | `b2_description` | B2 URDF, meshes, ros2_control config |
 | `robot_joint_controller` | Joint controller plugin for Gazebo |
 | `robot_msgs` | Controller message definitions |
+| `velodyne_gazebo_plugins` | Lidar plugin (`ring`, `timestamp` in PointCloud2) |
 
 ## Connect an external controller
 
