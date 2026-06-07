@@ -53,6 +53,8 @@ ros2 launch b2_sim gazebo.launch.py headless:=true gpu:=true
 
 Lidar output: `/rslidar_points` (`sensor_msgs/PointCloud2` with `ring` and `timestamp` fields via [velodyne_simulator](https://github.com/superdev11271/velodyne_simulator/tree/rslidar)).
 
+Odometry output: `/odom` (`nav_msgs/Odometry`, ground truth from `base_link`).
+
 ## Workspace packages
 
 | Package | Purpose |

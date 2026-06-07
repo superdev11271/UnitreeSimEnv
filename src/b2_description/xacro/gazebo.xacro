@@ -2,6 +2,7 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
     <xacro:include filename="$(find b2_description)/xacro/properties.xacro"/>
     <xacro:include filename="$(find b2_description)/xacro/sensors/imu.xacro"/>
+    <xacro:include filename="$(find b2_description)/xacro/sensors/odometry.xacro"/>
     <xacro:include filename="$(find b2_description)/xacro/sensors/lidar.xacro"/>
     <xacro:include filename="$(find b2_description)/xacro/sensors/camera.xacro"/>
     <xacro:include filename="$(find b2_description)/xacro/control/ros2_control.xacro"/>
