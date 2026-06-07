@@ -5,7 +5,14 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription, RegisterEventHandler
+from launch.actions import (
+    DeclareLaunchArgument,
+    ExecuteProcess,
+    GroupAction,
+    IncludeLaunchDescription,
+    RegisterEventHandler,
+    TimerAction,
+)
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command, LaunchConfiguration, PythonExpression
@@ -14,7 +21,7 @@ from launch_ros.parameter_descriptions import ParameterValue
 
 
 ROBOT_NAME = "b2"
-SPAWNER = "spawner.py" if os.environ.get("ROS_DISTRO", "") == "foxy" else "spawner"
+SPAWNER = "spawner"
 
 
 def generate_launch_description():
@@ -84,6 +91,7 @@ def generate_launch_description():
         arguments=[
             "-topic", "/robot_description",
             "-entity", "robot_model",
+            "-timeout", "60",
             "-x", "-7.089579",
             "-y", "-4.607656",
             "-z", "11.515228",
@@ -98,8 +106,11 @@ def generate_launch_description():
         output="screen",
     )
 
-    # rl_sim deletes /tmp/robot_joint_controller_params.yaml after spawning the
-    # controller, but gzserver may still need that path while loading it.
+    kill_stale_gazebo = ExecuteProcess(
+        cmd=["bash", "-c", "killall gzserver gzclient 2>/dev/null || true; sleep 1"],
+        output="screen",
+    )
+
     keep_rl_sar_params_file = ExecuteProcess(
         cmd=[
             "bash", "-c",
@@ -113,10 +124,23 @@ def generate_launch_description():
         output="log",
     )
 
+    simulation = GroupAction([
+        robot_state_publisher_node,
+        gazebo,
+        TimerAction(period=5.0, actions=[spawn_entity]),
+    ])
+
+    start_simulation = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=kill_stale_gazebo,
+            on_exit=[simulation],
+        ),
+    )
+
     load_joint_state_broadcaster = RegisterEventHandler(
         event_handler=OnProcessExit(
             target_action=spawn_entity,
-            on_exit=[joint_state_broadcaster_node],
+            on_exit=[TimerAction(period=5.0, actions=[joint_state_broadcaster_node])],
         ),
     )
 
@@ -144,11 +168,10 @@ def generate_launch_description():
     return LaunchDescription([
         declare_gpu,
         declare_headless,
-        keep_rl_sar_params_file,
-        robot_state_publisher_node,
-        gazebo,
-        spawn_entity,
+        kill_stale_gazebo,
+        start_simulation,
         load_joint_state_broadcaster,
+        keep_rl_sar_params_file,
         joy_node,
         param_node,
     ])
