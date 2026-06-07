@@ -18,10 +18,12 @@ RobotJointController::RobotJointController()
     memset(&servo_command_, 0, sizeof(ServoCommand));
 }
 
+#if defined(ROS_DISTRO_HUMBLE)
 CallbackReturn RobotJointController::on_init()
 {
     return CallbackReturn::SUCCESS;
 }
+#endif
 
 CallbackReturn RobotJointController::on_configure(const rclcpp_lifecycle::State &previous_state)
 {
@@ -76,6 +78,10 @@ CallbackReturn RobotJointController::on_configure(const rclcpp_lifecycle::State 
     controller_state_publisher_ = std::make_shared<realtime_tools::RealtimePublisher<robot_msgs::msg::MotorState>>(
         get_node()->create_publisher<robot_msgs::msg::MotorState>(/*name_space_ + */"~/state", rclcpp::SystemDefaultsQoS()));
 
+#if defined(ROS_DISTRO_FOXY)
+    previous_update_timestamp_ = get_node()->get_clock()->now();
+#endif
+
     RCLCPP_INFO(get_node()->get_logger(), "configure successful");
     return CallbackReturn::SUCCESS;
 }
@@ -125,10 +131,14 @@ CallbackReturn RobotJointController::on_deactivate(const rclcpp_lifecycle::State
     return CallbackReturn::SUCCESS;
 }
 
-controller_interface::return_type RobotJointController::update(const rclcpp::Time &time, const rclcpp::Duration &period)
+#if defined(ROS_DISTRO_FOXY)
+controller_interface::return_type RobotJointController::update()
 {
-    const auto period_seconds = period.seconds();
+    const auto current_time = get_node()->get_clock()->now();
+    const auto period_seconds = (current_time - previous_update_timestamp_).seconds();
+    previous_update_timestamp_ = current_time;
     auto joint_command = rt_command_ptr_.readFromRT();
+    // no command received yet
     if (!joint_command)
     {
         return controller_interface::return_type::OK;
@@ -137,6 +147,21 @@ controller_interface::return_type RobotJointController::update(const rclcpp::Tim
     UpdateFunc(period_seconds);
     return controller_interface::return_type::OK;
 }
+#elif defined(ROS_DISTRO_HUMBLE)
+controller_interface::return_type RobotJointController::update(const rclcpp::Time &time, const rclcpp::Duration &period)
+{
+    const auto period_seconds = period.seconds();
+    auto joint_command = rt_command_ptr_.readFromRT();
+    // no command received yet
+    if (!joint_command)
+    {
+        return controller_interface::return_type::OK;
+    }
+    last_command_ = *(joint_command);
+    UpdateFunc(period_seconds);
+    return controller_interface::return_type::OK;
+}
+#endif
 
 void RobotJointController::UpdateFunc(const double &period_seconds)
 {

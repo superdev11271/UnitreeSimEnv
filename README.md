@@ -1,6 +1,6 @@
 # B2 Simulation Environment
 
-Minimal ROS 2 Humble workspace for Gazebo simulation of the **Unitree B2** robot only. This project extracts the simulation launch flow from [rl_sar](https://github.com/fan-ziqi/rl_sar) and removes RL policy, inference, and controller code.
+Minimal ROS 2 workspace for Gazebo simulation of the **Unitree B2** robot only. This project extracts the simulation launch flow from [rl_sar](https://github.com/fan-ziqi/rl_sar) and removes RL policy, inference, and controller code.
 
 ## Supported robot
 
@@ -9,28 +9,32 @@ Unitree B2 only (hardcoded in the launch file).
 ## Dependencies
 
 ```bash
-# Ubuntu 22.04 + ROS 2 Humble
+# Ubuntu 22.04 (ROS 2 Humble) or Ubuntu 20.04 (ROS 2 Foxy)
 sudo apt install \
-  ros-humble-gazebo-ros-pkgs \
-  ros-humble-gazebo-ros2-control \
-  ros-humble-ros2-control \
-  ros-humble-ros2-controllers \
-  ros-humble-control-toolbox \
-  ros-humble-robot-state-publisher \
-  ros-humble-xacro \
-  ros-humble-joy \
-  ros-humble-demo-nodes-cpp
+  ros-$ROS_DISTRO-gazebo-ros-pkgs \
+  ros-$ROS_DISTRO-gazebo-ros2-control \
+  ros-$ROS_DISTRO-ros2-control \
+  ros-$ROS_DISTRO-ros2-controllers \
+  ros-$ROS_DISTRO-control-toolbox \
+  ros-$ROS_DISTRO-robot-state-publisher \
+  ros-$ROS_DISTRO-xacro \
+  ros-$ROS_DISTRO-joy \
+  ros-$ROS_DISTRO-demo-nodes-cpp
 ```
 
 ## Build
 
 ```bash
-source /opt/ros/humble/setup.bash
-git submodule update --init --recursive
+cd env_only
+source /opt/ros/$ROS_DISTRO/setup.bash
 ./build.sh
 ```
 
-Ensure `src/b2_description` (from [rl_sar_zoo](https://github.com/fan-ziqi/rl_sar_zoo)) and Gazebo models (`sun`, `ground_plane` in `~/.gazebo/models`) are present before building.
+Ensure `src/b2_description` (from [rl_sar_zoo](https://github.com/fan-ziqi/rl_sar_zoo)), the `velodyne_simulator` submodule, and Gazebo models (`sun`, `ground_plane` in `~/.gazebo/models`) are present before building.
+
+```bash
+git submodule update --init --recursive
+```
 
 ## Run
 

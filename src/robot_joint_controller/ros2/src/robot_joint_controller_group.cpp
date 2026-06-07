@@ -16,10 +16,12 @@ RobotJointControllerGroup::RobotJointControllerGroup()
     memset(&servo_command_, 0, sizeof(ServoCommand));
 }
 
+#if defined(ROS_DISTRO_HUMBLE)
 CallbackReturn RobotJointControllerGroup::on_init()
 {
     return CallbackReturn::SUCCESS;
 }
+#endif
 
 CallbackReturn RobotJointControllerGroup::on_configure(const rclcpp_lifecycle::State &previous_state)
 {
@@ -112,6 +114,10 @@ CallbackReturn RobotJointControllerGroup::on_configure(const rclcpp_lifecycle::S
     controller_state_publisher_ = std::make_shared<realtime_tools::RealtimePublisher<robot_msgs::msg::RobotState>>(
         get_node()->create_publisher<robot_msgs::msg::RobotState>(/*name_space_ + */"~/state", rclcpp::SystemDefaultsQoS()));
 
+#if defined(ROS_DISTRO_FOXY)
+    previous_update_timestamp_ = get_node()->get_clock()->now();
+#endif
+
     RCLCPP_INFO(get_node()->get_logger(), "configure successful");
     return CallbackReturn::SUCCESS;
 }
@@ -181,10 +187,14 @@ CallbackReturn RobotJointControllerGroup::on_deactivate(const rclcpp_lifecycle::
     return CallbackReturn::SUCCESS;
 }
 
-controller_interface::return_type RobotJointControllerGroup::update(const rclcpp::Time &time, const rclcpp::Duration &period)
+#if defined(ROS_DISTRO_FOXY)
+controller_interface::return_type RobotJointControllerGroup::update()
 {
-    const auto period_seconds = period.seconds();
+    const auto current_time = get_node()->get_clock()->now();
+    const auto period_seconds = (current_time - previous_update_timestamp_).seconds();
+    previous_update_timestamp_ = current_time;
     auto joint_commands = rt_command_ptr_.readFromRT();
+    // no command received yet
     if (!joint_commands)
     {
         return controller_interface::return_type::OK;
@@ -200,6 +210,28 @@ controller_interface::return_type RobotJointControllerGroup::update(const rclcpp
     UpdateFunc(period_seconds);
     return controller_interface::return_type::OK;
 }
+#elif defined(ROS_DISTRO_HUMBLE)
+controller_interface::return_type RobotJointControllerGroup::update(const rclcpp::Time &time, const rclcpp::Duration &period)
+{
+    const auto period_seconds = period.seconds();
+    auto joint_commands = rt_command_ptr_.readFromRT();
+    // no command received yet
+    if (!joint_commands)
+    {
+        return controller_interface::return_type::OK;
+    }
+    if (joint_commands->motor_command.size() != joint_names_.size())
+    {
+        RCLCPP_ERROR_THROTTLE(get_node()->get_logger(), *get_node()->get_clock(), 1000,
+            "command size (%zu) does not match number of interfaces (%zu)",
+            joint_commands->motor_command.size(), joint_names_.size());
+        return controller_interface::return_type::ERROR;
+    }
+    last_command_ = *(joint_commands);
+    UpdateFunc(period_seconds);
+    return controller_interface::return_type::OK;
+}
+#endif
 
 void RobotJointControllerGroup::UpdateFunc(const double &period_seconds)
 {
