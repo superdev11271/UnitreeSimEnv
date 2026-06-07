@@ -98,11 +98,6 @@ def generate_launch_description():
         output="screen",
     )
 
-    install_rl_sar_params_file = ExecuteProcess(
-        cmd=["cp", "-f", robot_joint_controller_params, "/tmp/robot_joint_controller_params.yaml"],
-        output="log",
-    )
-
     # rl_sim deletes /tmp/robot_joint_controller_params.yaml after spawning the
     # controller, but gzserver may still need that path while loading it.
     keep_rl_sar_params_file = ExecuteProcess(
@@ -111,7 +106,7 @@ def generate_launch_description():
             (
                 f'while true; do '
                 f'if [ ! -f /tmp/robot_joint_controller_params.yaml ]; then '
-                f'cp -f "{robot_joint_controller_params}" /tmp/robot_joint_controller_params.yaml; '
+                f'cp "{robot_joint_controller_params}" /tmp/robot_joint_controller_params.yaml; '
                 f'fi; sleep 0.05; done'
             ),
         ],
@@ -149,7 +144,6 @@ def generate_launch_description():
     return LaunchDescription([
         declare_gpu,
         declare_headless,
-        install_rl_sar_params_file,
         keep_rl_sar_params_file,
         robot_state_publisher_node,
         gazebo,
