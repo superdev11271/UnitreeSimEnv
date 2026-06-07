@@ -12,13 +12,8 @@
 #include "robot_msgs/msg/robot_command.hpp"
 #include "robot_msgs/msg/robot_state.hpp"
 #include "visibility_control.h"
-#if defined(ROS_DISTRO_FOXY)
-#include <realtime_tools/realtime_publisher.h>
-#include <realtime_tools/realtime_buffer.h>
-#elif defined(ROS_DISTRO_HUMBLE)
 #include <realtime_tools/realtime_publisher.hpp>
 #include <realtime_tools/realtime_buffer.hpp>
-#endif
 
 #include <stdio.h>
 #include <stdint.h>
@@ -42,11 +37,7 @@ typedef struct
 
 namespace robot_joint_controller
 {
-#if defined(ROS_DISTRO_FOXY)
-    using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
-#elif defined(ROS_DISTRO_HUMBLE)
-    using CallbackReturn = controller_interface::CallbackReturn;
-#endif
+using CallbackReturn = controller_interface::CallbackReturn;
 
 class RobotJointControllerGroup : public controller_interface::ControllerInterface
 {
@@ -54,15 +45,10 @@ public:
     ROBOT_JOINT_CONTROLLER_PUBLIC
     RobotJointControllerGroup();
 
-#if defined(ROS_DISTRO_FOXY)
-    ROBOT_JOINT_CONTROLLER_PUBLIC
-    controller_interface::return_type update() override;
-#elif defined(ROS_DISTRO_HUMBLE)
     ROBOT_JOINT_CONTROLLER_PUBLIC
     controller_interface::return_type update(const rclcpp::Time &time, const rclcpp::Duration &period) override;
     ROBOT_JOINT_CONTROLLER_PUBLIC
     CallbackReturn on_init() override;
-#endif
     ROBOT_JOINT_CONTROLLER_PUBLIC
     controller_interface::InterfaceConfiguration command_interface_configuration() const override;
     ROBOT_JOINT_CONTROLLER_PUBLIC
@@ -91,9 +77,6 @@ protected:
     rclcpp::Client<rcl_interfaces::srv::GetParameters>::SharedPtr robot_description_client_;
     rclcpp::Subscription<robot_msgs::msg::RobotCommand>::SharedPtr joints_command_subscriber_;
     std::shared_ptr<realtime_tools::RealtimePublisher<robot_msgs::msg::RobotState>> controller_state_publisher_;
-#if defined(ROS_DISTRO_FOXY)
-    rclcpp::Time previous_update_timestamp_{0};
-#endif
 };
 
 } // namespace robot_joint_controller
