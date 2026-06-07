@@ -3,7 +3,7 @@
     <gazebo>
         <plugin name="gazebo_ros_p3d" filename="libgazebo_ros_p3d.so">
             <ros>
-                <remapping>odom:=odom</remapping>
+                <remapping>odom:=dog_odom</remapping>
             </ros>
             <body_name>base_link</body_name>
             <frame_name>odom</frame_name>
