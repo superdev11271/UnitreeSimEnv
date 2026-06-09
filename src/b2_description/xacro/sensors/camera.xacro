@@ -39,4 +39,6 @@
 
     <xacro:camera_sensor link_name="f_oc_link" namespace="/camera_front"/>
     <xacro:camera_sensor link_name="r_oc_link" namespace="/camera_back"/>
+    <xacro:camera_sensor link_name="tf_oc_link" namespace="/camera_third_front"/>
+    <xacro:camera_sensor link_name="tb_oc_link" namespace="/camera_third_back"/>
 </robot>

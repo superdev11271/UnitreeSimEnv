@@ -1440,29 +1440,6 @@
         iyz="2.81E-45"
         izz="1.68E-27" />
     </inertial>
-    <!-- <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://b2_description/meshes/f_oc_link.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="1 1 1 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://b2_description/meshes/f_oc_link.STL" />
-      </geometry>
-    </collision> -->
   </link>
   <joint
     name="joint_f_oc"
@@ -1477,6 +1454,39 @@
     <axis
       xyz="0 0 0" />
   </joint>
+
+  <link
+    name="tb_oc_link">
+    <inertial>
+      <origin
+        xyz="-3.39E-15 1.46E-16 -6.11E-16"
+        rpy="0 0 0" />
+      <mass
+        value="4.19E-15" />
+      <inertia
+        ixx="1.68E-27"
+        ixy="-3.89E-44"
+        ixz="5.04E-44"
+        iyy="1.68E-27"
+        iyz="2.81E-45"
+        izz="1.68E-27" />
+    </inertial>
+  </link>
+  <joint
+    name="joint_tb_oc"
+    type="fixed">
+    <origin
+      xyz="-1.39079 0 0.5"
+      rpy="0 0.349066 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="tb_oc_link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  
   <link
     name="r_oc_link">
     <inertial>
@@ -1493,29 +1503,7 @@
         iyz="-1.2E-38"
         izz="1.68E-22" />
     </inertial>
-    <!-- <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://b2_description/meshes/r_oc_link.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="1 1 1 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://b2_description/meshes/r_oc_link.STL" />
-      </geometry>
-    </collision> -->
+
   </link>
   <joint
     name="joint_r_oc"
@@ -1530,6 +1518,39 @@
     <axis
       xyz="0 0 0" />
   </joint>
+
+
+  <link
+    name="tf_oc_link">
+    <inertial>
+      <origin
+        xyz="-0.39143 1.52E-07 -0.011961"
+        rpy="0 0 0" />
+      <mass
+        value="4.19E-12" />
+      <inertia
+        ixx="1.68E-22"
+        ixy="9.03E-39"
+        ixz="0"
+        iyy="1.68E-22"
+        iyz="-1.2E-38"
+        izz="1.68E-22" />
+    </inertial>
+  </link>
+  <joint
+    name="joint_tf_oc"
+    type="fixed">
+    <origin
+      xyz="1.3 0 0.5"
+      rpy="0 0.349066 3.14159" />
+    <parent
+      link="base_link" />
+    <child
+      link="tf_oc_link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
 
   <transmission name="FL_hip_tran">
     <type>transmission_interface/SimpleTransmission</type>
