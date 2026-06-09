@@ -22,6 +22,7 @@ from launch_ros.parameter_descriptions import ParameterValue
 
 ROBOT_NAME = "b2"
 SPAWNER = "spawner"
+CAMERA_JPEG_QUALITY = 60
 
 
 def generate_launch_description():
@@ -35,7 +36,6 @@ def generate_launch_description():
         default_value="false",
         description="Run Gazebo without GUI",
     )
-
     gpu = LaunchConfiguration("gpu")
     headless = LaunchConfiguration("headless")
     gui = PythonExpression([
@@ -165,6 +165,23 @@ def generate_launch_description():
         }],
     )
 
+    def camera_compress_node(camera_ns: str) -> Node:
+        return Node(
+            package="image_transport",
+            executable="republish",
+            name=f"{camera_ns.strip('/')}_compress",
+            arguments=["raw", "compressed"],
+            remappings=[
+                ("in", f"{camera_ns}/image_raw"),
+                ("out", camera_ns),
+            ],
+            parameters=[{
+                f"{camera_ns.strip('/')}.format": "jpeg",
+                f"{camera_ns.strip('/')}.jpeg_quality": CAMERA_JPEG_QUALITY,
+            }],
+            output="screen",
+        )
+
     return LaunchDescription([
         declare_gpu,
         declare_headless,
@@ -172,6 +189,8 @@ def generate_launch_description():
         start_simulation,
         load_joint_state_broadcaster,
         keep_rl_sar_params_file,
+        camera_compress_node("/camera_front"),
+        camera_compress_node("/camera_back"),
         joy_node,
         param_node,
     ])
