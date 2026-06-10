@@ -92,9 +92,9 @@ def generate_launch_description():
             "-topic", "/robot_description",
             "-entity", "robot_model",
             "-timeout", "60",
-            "-x", "-7.089579",
-            "-y", "-4.607656",
-            "-z", "11.515228",
+            "-x", "0",
+            "-y", "0",
+            "-z", "1",
         ],
         output="screen",
     )
