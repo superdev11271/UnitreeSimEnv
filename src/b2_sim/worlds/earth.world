@@ -37,7 +37,7 @@
         <include>
             <uri>model://my_model</uri>
             <name>my_model_instance</name>
-            <pose>1 0 0 0 0 0</pose>
+            <pose>0 0 0 0 0 0</pose>
         </include>
 
     </world>

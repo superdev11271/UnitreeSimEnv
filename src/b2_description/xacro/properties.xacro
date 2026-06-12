@@ -3,5 +3,9 @@
     <xacro:property name="hip_torque_max" value="200"/>
     <xacro:property name="thigh_torque_max" value="200"/>
     <xacro:property name="calf_torque_max" value="320"/>
+    <!-- Folded leg pose from mjcf/b2.xml home keyframe -->
+    <xacro:property name="default_hip_pos" value="0.0"/>
+    <xacro:property name="default_thigh_pos" value="1.28"/>
+    <xacro:property name="default_calf_pos" value="-2.84"/>
     <xacro:property name="ros_version" value="$(env ROS_VERSION)" />
 </robot>
