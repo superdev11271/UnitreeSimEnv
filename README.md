@@ -74,7 +74,7 @@ This workspace starts the simulation environment. `robot_joint_controller` is sp
 1. Start this simulation: `ros2 launch b2_sim gazebo.launch.py`
 2. In another terminal, run rl_sar controller: `ros2 run rl_sar rl_sim`
 
-The launch file exposes `param_node` with `robot_name=b2` and `gazebo_model_name=b2_gazebo` for compatibility with rl_sar.
+The launch file exposes `param_node` with `robot_name=b2` and `gazebo_model_name=robot_model` (must match `gazebo_model_name` in `UnitreeSimCtrl/policy/b2/base.yaml`).
 
 ## Clean
 

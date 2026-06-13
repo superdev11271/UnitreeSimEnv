@@ -3,7 +3,7 @@
 
 import os
 
-from ament_index_python.packages import get_package_share_directory
+from ament_index_python.packages import get_package_prefix, get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import (
     DeclareLaunchArgument,
@@ -21,7 +21,10 @@ from launch_ros.parameter_descriptions import ParameterValue
 
 
 ROBOT_NAME = "b2"
-SPAWNER = "spawner"
+GAZEBO_MODEL_NAME = "robot_model"
+SPAWN_X = "126.079353"
+SPAWN_Y = "-43.795204"
+SPAWN_Z = "2"
 CAMERA_JPEG_QUALITY = 60
 
 
@@ -43,6 +46,7 @@ def generate_launch_description():
     ])
     wname = "earth"
 
+    b2_sim_prefix = get_package_prefix("b2_sim")
     b2_description_share = get_package_share_directory("b2_description")
     robot_joint_controller_params = os.path.join(
         b2_description_share,
@@ -90,19 +94,24 @@ def generate_launch_description():
         executable="spawn_entity.py",
         arguments=[
             "-topic", "/robot_description",
-            "-entity", "robot_model",
+            "-entity", GAZEBO_MODEL_NAME,
             "-timeout", "60",
-            "-x", "0",
-            "-y", "0",
-            "-z", "1",
+            "-x", SPAWN_X,
+            "-y", SPAWN_Y,
+            "-z", SPAWN_Z,
         ],
         output="screen",
     )
 
-    joint_state_broadcaster_node = Node(
-        package="controller_manager",
-        executable=SPAWNER,
-        arguments=["joint_state_broadcaster"],
+    joint_state_broadcaster_node = ExecuteProcess(
+        cmd=[
+            os.path.join(
+                b2_sim_prefix,
+                "lib",
+                "b2_sim",
+                "load_joint_state_broadcaster.py",
+            ),
+        ],
         output="screen",
     )
 
@@ -140,7 +149,7 @@ def generate_launch_description():
     load_joint_state_broadcaster = RegisterEventHandler(
         event_handler=OnProcessExit(
             target_action=spawn_entity,
-            on_exit=[TimerAction(period=5.0, actions=[joint_state_broadcaster_node])],
+            on_exit=[TimerAction(period=15.0, actions=[joint_state_broadcaster_node])],
         ),
     )
 
@@ -161,7 +170,7 @@ def generate_launch_description():
         name="param_node",
         parameters=[{
             "robot_name": ROBOT_NAME,
-            "gazebo_model_name": f"{ROBOT_NAME}_gazebo",
+            "gazebo_model_name": GAZEBO_MODEL_NAME,
         }],
     )
 

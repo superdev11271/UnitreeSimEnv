@@ -35,5 +35,12 @@
         <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
             <parameters>$(find b2_description)/config/robot_control.yaml</parameters>
         </plugin>
+        <!-- Instant joint pose reset for rl_sim /reset (ROS 2 Humble has no set_model_configuration). -->
+        <plugin name="gazebo_ros_joint_pose_trajectory" filename="libgazebo_ros_joint_pose_trajectory.so">
+            <ros>
+                <namespace>/gazebo</namespace>
+            </ros>
+            <update_rate>100</update_rate>
+        </plugin>
     </gazebo>
 </robot>

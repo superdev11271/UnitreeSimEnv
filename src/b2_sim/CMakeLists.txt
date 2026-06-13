@@ -8,4 +8,9 @@ install(
   DESTINATION share/${PROJECT_NAME}
 )
 
+install(
+  PROGRAMS scripts/load_joint_state_broadcaster.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 ament_package()
