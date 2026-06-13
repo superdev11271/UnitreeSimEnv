@@ -25,7 +25,7 @@ GAZEBO_MODEL_NAME = "robot_model"
 SPAWN_X = "126.079353"
 SPAWN_Y = "-43.795204"
 SPAWN_Z = "2"
-CAMERA_JPEG_QUALITY = 60
+CAMERA_JPEG_QUALITY = 40
 
 
 def generate_launch_description():
