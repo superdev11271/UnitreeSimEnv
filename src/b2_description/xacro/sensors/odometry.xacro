@@ -1,16 +1,5 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-    <gazebo>
-        <plugin name="gazebo_ros_p3d" filename="libgazebo_ros_p3d.so">
-            <ros>
-                <remapping>odom:=dog_odom</remapping>
-            </ros>
-            <body_name>base_link</body_name>
-            <frame_name>odom</frame_name>
-            <!-- Match spawn pose in gazebo.launch.py so odom origin is at spawn -->
-            <xyz_offset>0 0 -1</xyz_offset>
-            <update_rate>50.0</update_rate>
-            <gaussian_noise>0.0</gaussian_noise>
-        </plugin>
-    </gazebo>
+    <!-- /dog_odom is published by b2_sim/scripts/dog_odom_publisher.py (spawn-relative).
+         Absolute ground truth remains on /world_pose (world_pose.xacro). -->
 </robot>

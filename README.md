@@ -53,7 +53,7 @@ ros2 launch b2_sim gazebo.launch.py headless:=true gpu:=true
 
 Lidar output: `/rslidar_points` (`sensor_msgs/PointCloud2` with `ring` and `timestamp` fields via [velodyne_simulator](https://github.com/superdev11271/velodyne_simulator/tree/rslidar)).
 
-Odometry output: `/dog_odom` (`nav_msgs/Odometry`, spawn-relative ground truth from `base_link`).
+Odometry output: `/dog_odom` (`nav_msgs/Odometry`, spawn-relative ground truth). Origin is set at Gazebo spawn and updated when `/dog_odom/set_origin` is published (rl_sim sends this after each simulation reset) or when `/reset_dog_odom` (`std_srvs/Empty`) is called.
 
 World pose output: `/world_pose` (`nav_msgs/Odometry`, absolute Gazebo world coordinates).
 

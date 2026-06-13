@@ -174,6 +174,19 @@ def generate_launch_description():
         }],
     )
 
+    dog_odom_publisher_node = Node(
+        package="b2_sim",
+        executable="dog_odom_publisher.py",
+        name="dog_odom_publisher",
+        output="screen",
+        parameters=[{
+            "initial_origin_x": float(SPAWN_X),
+            "initial_origin_y": float(SPAWN_Y),
+            "initial_origin_z": float(SPAWN_Z),
+            "initial_origin_yaw": 0.0,
+        }],
+    )
+
     def camera_compress_node(camera_ns: str) -> Node:
         return Node(
             package="image_transport",
@@ -202,4 +215,5 @@ def generate_launch_description():
         camera_compress_node("/camera_back"),
         joy_node,
         param_node,
+        dog_odom_publisher_node,
     ])

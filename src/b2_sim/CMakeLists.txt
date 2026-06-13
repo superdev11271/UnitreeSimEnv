@@ -9,7 +9,7 @@ install(
 )
 
 install(
-  PROGRAMS scripts/load_joint_state_broadcaster.py
+  PROGRAMS scripts/load_joint_state_broadcaster.py scripts/dog_odom_publisher.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
